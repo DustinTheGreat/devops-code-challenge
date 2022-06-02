@@ -1,6 +1,11 @@
-# serverless.yml
+app: ${env:PROJECT_NAME}
 
-service: lightfeather-backend
+service: ${env:PROJECT_NAME}
+
+plugins:
+  - serverless-hosted-zone
+  - serverless-certificate-creator
+  - fullstack-serverless
 
 provider:
   name: aws
@@ -12,4 +17,25 @@ functions:
   app:
     handler: index.handler
     events:
-      - http: ANY /
+      - http: get /
+custom:
+  hostedZone:
+    name: ${env:CLIENT_URL}.
+  customCertificate:
+    hostedZoneNames: '${env:CLIENT_URL}.'
+    certificateName: ${env:CLIENT_URL}
+    region: us-east-1
+  customDomain:
+    domainName: ${env:CLIENT_URL}
+    certificateName: ${env:CLIENT_URL}
+    createRoute53Record: true
+    autoDomain: true
+  fullstack:
+    domain: ${env:CLIENT_URL}
+    certificate: arn:aws:acm:us-east-1:483973189743:certificate/15e0d0a2-4b0e-4f33-842a-868722d3f033
+    bucketName: ${env:PROJECT_NAME}-bucket
+    distributionFolder: ../frontend/build 
+    indexDocument: index.html
+    errorDocument: error.html
+    singlePageApp: true
+    compressWebContent: true
