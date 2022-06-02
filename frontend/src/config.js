@@ -1,2 +1,2 @@
-export const API_URL = 'https://ovj23g938f.execute-api.us-east-1.amazonaws.com/dev'
+export const API_URL = 'https://api.birdinthewind.com/'
 export default API_URL
