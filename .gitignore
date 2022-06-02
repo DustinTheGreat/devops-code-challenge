@@ -1,1 +1,4 @@
 node_modules/
+lightfeather-backend.zip
+cloudformation*
+serverless-state.json
