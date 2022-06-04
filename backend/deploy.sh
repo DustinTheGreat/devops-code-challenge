@@ -4,7 +4,11 @@ function deploy(){
     sls create-cert
     sls deploy
 }
+function get_hosted_zone(){
+   HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name |  jq --arg name "${CLIENT_URL}." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id' | awk -F/ '{print $NF}')
+   echo $HOSTED_ZONE
 
+}
 
 function create_record(){
     sls  info >> peptides.txt
@@ -41,4 +45,5 @@ else
 fi
 
 deploy
+get_hosted_zone
 create_record
