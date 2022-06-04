@@ -1,9 +1,10 @@
-
+#!/bin/bash
 
 function deploy(){
     sls create-cert
     sls deploy
 }
+
 function get_hosted_zone(){
    HOSTED_ZONE=$(aws route53 list-hosted-zones-by-name |  jq --arg name "${CLIENT_URL}." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id' | awk -F/ '{print $NF}')
    echo $HOSTED_ZONE
@@ -11,8 +12,8 @@ function get_hosted_zone(){
 }
 
 function create_record(){
-    sls  info >> peptides.txt
-    cat peptides.txt | while read line 
+    sls  info >> sls_temp_info.txt
+    cat sls_temp_info.txt | while read line 
     do
         if [[ "$line" == *"Target Domain:"* ]]; then
 
@@ -22,13 +23,12 @@ function create_record(){
         fi
 
     done
-    rm peptides.txt
     source deploy-conf
 
-    envsubst < "test.json" > "destination.json"
+    envsubst < "create-record.json" > "destination.json"
     aws route53 change-resource-record-sets --hosted-zone-id $HOSTED_ZONE --change-batch file://destination.json
-    rm destination.json
-    rm deploy-conf
+    rm sls_temp_info.txt deploy-conf destination.json
+
 }
 
 if [[ ${CLIENT_URL} ]]; then
